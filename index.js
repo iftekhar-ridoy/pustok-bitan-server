@@ -19,6 +19,16 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try {
+        const categoryOptionCollention = client.db('pustokBitan').collection('categoriesCollection');
+
+        // get categories from server
+        app.get('/categories', async (req, res) => {
+            const query = {};
+            const result = await categoryOptionCollention.find(query).toArray();
+            res.send(result);
+        })
+
+
 
     }
     finally {
