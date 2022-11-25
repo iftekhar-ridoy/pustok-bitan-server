@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 require('dotenv').config();
 const app = express();
@@ -20,6 +20,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const categoryOptionCollention = client.db('pustokBitan').collection('categoriesCollection');
+        const usersCollention = client.db('pustokBitan').collection('users');
 
         // get categories from server
         app.get('/categories', async (req, res) => {
@@ -28,6 +29,20 @@ async function run() {
             res.send(result);
         })
 
+        //get id wise category
+        app.get('/categories/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await categoryOptionCollention.findOne(query);
+            res.send(result);
+        })
+
+        //post users data
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollention.insertOne(user);
+            res.send(result);
+        })
 
 
     }
