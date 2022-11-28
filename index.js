@@ -88,6 +88,7 @@ async function run() {
             res.send(result);
         })
 
+
         //delete user data
         app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
@@ -130,6 +131,7 @@ async function run() {
             const booking = await bookingCollention.find(query).toArray();
             res.send(booking);
         })
+
 
         //post booking of a book data
         app.post('/bookings', async (req, res) => {
