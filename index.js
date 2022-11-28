@@ -43,6 +43,7 @@ async function run() {
         const usersCollention = client.db('pustokBitan').collection('users');
         const bookingCollention = client.db('pustokBitan').collection('bookings');
         const addProductCollention = client.db('pustokBitan').collection('addProduct');
+        const addAdvertiseCollention = client.db('pustokBitan').collection('addAdvertise');
 
         // JWT 
         app.get('/jwt', async (req, res) => {
@@ -164,6 +165,22 @@ async function run() {
             const resultAddProduct = await addProductCollention.insertOne(addProduct);
             res.send(resultAddProduct);
         })
+
+        //post advertisement product data
+        app.post('/addAdvertise', async (req, res) => {
+            const addAdvertise = req.body;
+            const resultAddAdvertise = await addAdvertiseCollention.insertOne(addAdvertise);
+            res.send(resultAddAdvertise);
+        })
+
+        //get advertisement product data
+        app.get('/addAdvertise', async (req, res) => {
+            const query = {};
+            const getAddAdvertise = await addAdvertiseCollention.find(query).toArray();
+            res.send(getAddAdvertise);
+        })
+
+
 
 
 
