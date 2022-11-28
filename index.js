@@ -4,6 +4,8 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 require('dotenv').config();
 const app = express();
+const jwt = require('jsonwebtoken');
+
 
 
 // middleware 
@@ -24,6 +26,20 @@ async function run() {
         const bookingCollention = client.db('pustokBitan').collection('bookings');
         const addProductCollention = client.db('pustokBitan').collection('addProduct');
 
+        // JWT 
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const user = await usersCollention.findOne(query);
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '24h' })
+                return res.send({ accessToken: token });
+            }
+            res.status(403).send({ accessToken: '' });
+        })
+
+
+
         // get categories from server
         app.get('/categories', async (req, res) => {
             const query = {};
@@ -39,6 +55,14 @@ async function run() {
             res.send(result);
         })
 
+        //get users data
+        app.get('/users', async (req, res) => {
+            const query = {};
+            const result = await usersCollention.find(query).toArray();
+            res.send(result);
+        })
+
+
         //post users data
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -46,8 +70,16 @@ async function run() {
             res.send(result);
         })
 
+        //delete user data
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollention.deleteOne(query);
+            res.send(result);
+        })
 
-        //get current users booking data
+
+        //get booking data
         app.get('/bookings', async (req, res) => {
             const email = req.query.email;
             const query = { email: email };
@@ -70,6 +102,16 @@ async function run() {
             res.send(result);
         })
 
+        //get products data
+        app.get('/addProduct', async (req, res) => {
+            const email = req.query.email;
+            const query = { sellerEmail: email };
+            console.log(email);
+            const addProduct = await addProductCollention.find(query).toArray();
+            console.log(addProduct);
+            res.send(addProduct);
+        })
+
         //post new-product data
         app.post('/addProduct', async (req, res) => {
             const addProduct = req.body;
@@ -77,14 +119,7 @@ async function run() {
             res.send(resultAddProduct);
         })
 
-        //get current users all products data
-        app.get('/addProduct', async (req, res) => {
-            // const email = req.query.email;
-            // const query = { email: email };
-            const query = {};
-            const addProduct = await addProductCollention.find(query).toArray();
-            res.send(addProduct);
-        })
+
 
         //delete a product data
         app.delete('/addProduct/:id', async (req, res) => {
